@@ -1,2 +1,4 @@
 ﻿  bonuscode.cpp
-  bonuscode.vcxproj -> C:\Users\regis\Рабочий стол\programmig\ООП\bonuscode\x64\Debug\bonuscode.exe
+C:\Users\regis\Рабочий стол\programmig\OOP\bonuscode\bonuscode\bonuscode.cpp(15,13): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\regis\Рабочий стол\programmig\OOP\bonuscode\bonuscode\bonuscode.cpp(21,13): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  bonuscode.vcxproj -> C:\Users\regis\Рабочий стол\programmig\OOP\bonuscode\x64\Debug\bonuscode.exe
