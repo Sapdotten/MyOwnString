@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <stdexcept>
+using namespace std;
 
 // String() +
 // String(const char*) +
@@ -46,24 +47,30 @@ public:
         return _size;
     }
     char* c_str() const{
+        if (_string == nullptr)
+            throw std::invalid_argument("string is void");
         return _string;
     }
     bool is_static() const{
         /*возращает true, если строка не использует динамику*/
-        return(_string == _short_string);
+        return(_string == _short_string || _string==nullptr);
     }
 
-    String(const String& str) {
-        if (!str.is_static()){
-            _size = str._size;
-            _string = new char[_size + (5 - (_size + 1) % 4)];
-            strcpy(_string, str._string);
-        }
-        else {
-            strcpy(_short_string, str._short_string);
-            _string = _short_string;
-        }
-    }
+	String(const String& str) {
+        if (str._string == nullptr)
+            throw std::invalid_argument("string is void");
+		if (!str.is_static()) {
+			_size = str._size;
+			_string = new char[_size + (5 - (_size + 1) % 4)];
+			strcpy(_string, str._string);
+		}
+		else {
+			strcpy(_short_string, str._short_string);
+			_string = _short_string;
+		}
+
+
+	}
     void swap(String str) {
         if (str.is_static()) {
             if (is_static()) {
@@ -123,7 +130,7 @@ public:
     }
     String& operator+=(const String& b) {
         if (_string == nullptr || b._string == nullptr)
-            throw std::invalid_argument("");
+            throw std::invalid_argument("void string");
 
         int delta = 4 - (size() + 1) % 4;
         int size = this->size() + b.size();
@@ -143,7 +150,7 @@ public:
     }
     String operator+(const String& b) const{
         if (_string == nullptr || b._string == nullptr)
-            throw std::invalid_argument("");
+            throw std::invalid_argument("void string");
 
         String a = *this;
         int delta = 4 - (a.size() + 1) % 4;
@@ -205,16 +212,54 @@ public:
     }
 };
 
-
+void PrintStrInfo(const String& str) {
+    try {
+        cout << "\nString: " <<"\"" << str.c_str()<< "\"";
+    }
+    catch (invalid_argument err) {
+        cout << "\n" << "### Error: "<<err.what();
+    }
+    
+    cout << "\nCount of symbols: " << str.size();
+    cout << "\nMemory use: ";
+    if (str.is_static())
+        cout << "static";
+    else
+        cout << "dynamic";
+    cout << "\n";
+}
 
 
 int main()
 {
     String static_str("There is no dynamic mem");
     String dynam_str("This string is using a heap");
-    std::cout << dynam_str.is_static() << " " << static_str.is_static();
-    String result = static_str + dynam_str;
-    std::cout << std::endl << result.c_str() << " " << result.size() << " " << result.is_static();
+    String voidstr;
+    String nvoidstr("");
+    String sum = (static_str + dynam_str);
+    String str1;
+    try {
+        String str2 = str1;
+    }
+    catch (invalid_argument err) {
+        cout << "### Error:" << err.what();
+    }
+    
+    PrintStrInfo(str1);
+
+    PrintStrInfo(static_str);
+    PrintStrInfo(dynam_str);
+    PrintStrInfo(voidstr);
+    PrintStrInfo(nvoidstr);
+    PrintStrInfo(sum);
+    PrintStrInfo((sum.substr(34, 7)));
+    try {
+        PrintStrInfo(voidstr + nvoidstr);
+    }
+    catch (invalid_argument err) {
+        cout <<"### Error: " << err.what();
+    }
+    
  
     
     return 0;
