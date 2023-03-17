@@ -76,19 +76,33 @@ struct String {
             }
             else {
                 unsigned long long temp = _size;
-                strcpy(_short_string, str._short_string);
-                str._size = temp;
-                str._string = _string;
-                _string = _short_string;
+                if (_string == nullptr) {
+                    *this = String(str._string);
+                    str = String();
+                }
+                else{
+                    strcpy(_short_string, str._short_string);
+                    str._size = temp;
+                    str._string = _string;
+                    _string = _short_string;
+                }
+                
             }
             
         }
         else if(_string ==_short_string){
-            unsigned long long temp = str._size;
-            strcpy(str._short_string, _short_string);
-            _size = temp;
-            _string = str._string;
-            str._string = str._short_string;
+            if (str._string == nullptr) {
+                str = String(str._string);
+                *this = String();
+            }
+            else {
+                unsigned long long temp = str._size;
+                strcpy(str._short_string, _short_string);
+                _size = temp;
+                _string = str._string;
+                str._string = str._short_string;
+            }
+            
         }
         else {
             std::swap(_string, str._string);
@@ -96,8 +110,7 @@ struct String {
         }
     }
 
-    String& operator=(const String str)
-    {
+    String& operator=(const String str){
         this->swap(str);
         return *this;
     }
@@ -114,16 +127,19 @@ struct String {
         return a;
     }
 
-    String& operator+=(const String& str) {
+    String& operator+=(const String& b) {
+        if (_string == nullptr || b._string == nullptr)
+            throw std::invalid_argument("");
+
         int delta = 4 - (size() + 1) % 4;
-        int size = this->size() + str.size();
-        if (size<24 || str.size() <= delta) {
-            strcat(_string, str._string);
+        int size = this->size() + b.size();
+        if (size<24 || b.size() <= delta) {
+            strcat(_string, b._string);
         }
         else {
             char *ptr = new char[size + (5 - (size + 1) % 4)];
             strcpy(ptr, _string);
-            strcat(ptr, str._string);
+            strcat(ptr, b._string);
             delete[] _string;
             _string = ptr;
         }
@@ -133,6 +149,9 @@ struct String {
     }
 
     String operator+(const String& b) const{
+        if (_string == nullptr || b._string == nullptr)
+            throw std::invalid_argument("");
+
         String a = *this;
         int delta = 4 - (a.size() + 1) % 4;
         int size = a.size() + b.size();
@@ -163,6 +182,8 @@ struct String {
     }
 
     bool operator==(const String& b) const {
+        if(_string==nullptr || b._string == nullptr)
+            throw std::invalid_argument("impossible to compare void strings");
         return !strcmp(this->_string, b._string);
     }
     bool operator!=(const String& b) const {
@@ -195,6 +216,11 @@ int main()
     String sub = str1.substr(3, 10);
     std::cout << str1.size()<<" + "<<str2.size()<<" = "<<str3.size()<<std::endl;
     std::cout << str1.c_str() << " + " << str2._string<<" = "<<str3._string;
-    std::cout <<std::endl<< (str1==str4);
+    try{ std::cout << std::endl << (str1 == str4); 
+    }
+    catch (std::invalid_argument e) {
+        std::cout<<std::endl << e.what();
+    }
+    
 
 }
