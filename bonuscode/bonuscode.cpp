@@ -8,7 +8,7 @@
 // ~String +
 // +=, = +
 // ==, != +
-// string s.substr(int index, int length) 
+// string s.substr(int index, int length) +
 // size() +
 // []x2 +
 
@@ -21,9 +21,8 @@ struct String {
         char _short_string[24];//по 4 байта на 4 символа
     };
 
-
+public:
     String() :_string(nullptr), _size(0) {};
-
     String(const char* str) {
         if (strlen(str) < 24) {
             strcpy(_short_string, str);
@@ -40,22 +39,22 @@ struct String {
     }
 
 
-
     unsigned long long size() const{
         if (_string==_short_string) {
             return strlen(_string);
         }
         return _size;
     }
-
     char* c_str() const{
         return _string;
     }
-
-
+    bool is_static() const{
+        /*возращает true, если строка не использует динамику*/
+        return(_string == _short_string);
+    }
 
     String(const String& str) {
-        if (str._string != str._short_string){
+        if (!str.is_static()){
             _size = str._size;
             _string = new char[_size + (5 - (_size + 1) % 4)];
             strcpy(_string, str._string);
@@ -65,10 +64,9 @@ struct String {
             _string = _short_string;
         }
     }
-
     void swap(String str) {
-        if (str._string == str._short_string) {
-            if (_string == _short_string) {
+        if (str.is_static()) {
+            if (is_static()) {
                 char temp[24];
                 strcpy(temp, _short_string);
                 strcpy(_short_string, str._short_string);
@@ -90,7 +88,7 @@ struct String {
             }
             
         }
-        else if(_string ==_short_string){
+        else if(is_static()){
             if (str._string == nullptr) {
                 str = String(str._string);
                 *this = String();
@@ -109,24 +107,20 @@ struct String {
             std::swap(_size, str._size);
         }
     }
-
     String& operator=(const String str){
         this->swap(str);
         return *this;
     }
-
     ~String(){
-        if(_string!=_short_string)
+        if(!is_static())
         delete[] _string;
     }
-
 
 
     String operator=(const char* str) {
         String a(str);
         return a;
     }
-
     String& operator+=(const String& b) {
         if (_string == nullptr || b._string == nullptr)
             throw std::invalid_argument("");
@@ -143,11 +137,10 @@ struct String {
             delete[] _string;
             _string = ptr;
         }
-        if (_string != _short_string)
+        if (!is_static())
             _size = size;
         return *this;
     }
-
     String operator+(const String& b) const{
         if (_string == nullptr || b._string == nullptr)
             throw std::invalid_argument("");
@@ -162,10 +155,11 @@ struct String {
             char* ptr = new char[size + (5 - (size + 1) % 4)];
             strcpy(ptr, a._string);
             strcat(ptr, b._string);
+            if(!a.is_static())
             delete[] a._string;
             a._string = ptr;
         }
-        if (a._string != a._short_string)
+        if (!a.is_static())
             a._size = size;
         return a;
     }
@@ -173,11 +167,15 @@ struct String {
     char operator[](int index) const {
         if(index>_size)
             throw std::out_of_range("");
+        if (index < 0)
+            throw std::invalid_argument("");
         return _string[index];
     }
     char& operator[](int index){
         if (index > _size)
             throw std::out_of_range("");
+        if (index < 0)
+            throw std::invalid_argument("");
         return _string[index];
     }
 
@@ -191,8 +189,13 @@ struct String {
     }
 
     String substr(int index, int length) {
+        if (_string == nullptr)
+            throw std::invalid_argument("param can't be void string");
         if (index + length >= _size)
             throw std::out_of_range("");
+        if (index < 0 || length <= 0)
+            throw std::invalid_argument("");
+
         char* str = new char[length + 1];
         strncpy(str, _string + index, length);
         str[length] = 0;
@@ -207,20 +210,12 @@ struct String {
 
 int main()
 {
-    String str1("There is a test string");
-    String str2("!");
-    String str3 = "aaaaaaaaaaaaaaaaaaaaaaaaa";
-    int size = str1.size();
-    str3=str1+ str2;
-    String str4;
-    String sub = str1.substr(3, 10);
-    std::cout << str1.size()<<" + "<<str2.size()<<" = "<<str3.size()<<std::endl;
-    std::cout << str1.c_str() << " + " << str2._string<<" = "<<str3._string;
-    try{ std::cout << std::endl << (str1 == str4); 
-    }
-    catch (std::invalid_argument e) {
-        std::cout<<std::endl << e.what();
-    }
+    String static_str("There is no dynamic mem");
+    String dynam_str("This string is using a heap");
+    std::cout << dynam_str.is_static() << " " << static_str.is_static();
+    String result = static_str + dynam_str;
+    std::cout << std::endl << result.c_str() << " " << result.size() << " " << result.is_static();
+ 
     
-
+    return 0;
 }
