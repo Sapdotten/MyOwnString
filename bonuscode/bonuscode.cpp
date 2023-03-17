@@ -1,4 +1,5 @@
 ﻿#include <iostream>
+#include <stdexcept>
 
 // String() +
 // String(const char*) +
@@ -151,9 +152,13 @@ struct String {
     }
 
     char operator[](int index) const {
+        if(index>_size)
+            throw std::out_of_range("");
         return _string[index];
     }
     char& operator[](int index){
+        if (index > _size)
+            throw std::out_of_range("");
         return _string[index];
     }
 
@@ -165,6 +170,8 @@ struct String {
     }
 
     String substr(int index, int length) {
+        if (index + length >= _size)
+            throw std::out_of_range("");
         char* str = new char[length + 1];
         strncpy(str, _string + index, length);
         str[length] = 0;
@@ -184,9 +191,10 @@ int main()
     String str3 = "aaaaaaaaaaaaaaaaaaaaaaaaa";
     int size = str1.size();
     str3=str1+ str2;
+    String str4;
     String sub = str1.substr(3, 10);
     std::cout << str1.size()<<" + "<<str2.size()<<" = "<<str3.size()<<std::endl;
     std::cout << str1.c_str() << " + " << str2._string<<" = "<<str3._string;
-    std::cout <<std::endl<< sub.c_str();
+    std::cout <<std::endl<< (str1==str4);
 
 }
