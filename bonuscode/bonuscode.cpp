@@ -160,11 +160,18 @@ struct String {
     bool operator==(const String& b) const {
         return !strcmp(this->_string, b._string);
     }
-    bool operator!=(const String& b) {
+    bool operator!=(const String& b) const {
         return !(*this == b);
     }
 
-
+    String substr(int index, int length) {
+        char* str = new char[length + 1];
+        strncpy(str, _string + index, length);
+        str[length] = 0;
+        String a(str);
+        delete[] str;
+        return a;
+    }
 };
 
 
@@ -172,12 +179,14 @@ struct String {
 
 int main()
 {
-    String str1("Helloddddddddddddddddddddddddddddddd");
+    String str1("There is a test string");
     String str2("!");
     String str3 = "aaaaaaaaaaaaaaaaaaaaaaaaa";
     int size = str1.size();
     str3=str1+ str2;
-    std::cout << str1.size()<<"+"<<str2.size()<<"="<<str3.size()<<std::endl;
-    std::cout << str1.c_str() << "+" << str2._string<<" "<<str3._string;
+    String sub = str1.substr(3, 10);
+    std::cout << str1.size()<<" + "<<str2.size()<<" = "<<str3.size()<<std::endl;
+    std::cout << str1.c_str() << " + " << str2._string<<" = "<<str3._string;
+    std::cout <<std::endl<< sub.c_str();
 
 }
